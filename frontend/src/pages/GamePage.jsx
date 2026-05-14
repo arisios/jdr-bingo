@@ -115,6 +115,14 @@ export default function GamePage() {
             {soundEnabled ? '🔊' : '🔇'}
           </button>
         </div>
+        {round?.premio && (
+          <div className="max-w-sm mx-auto mt-2">
+            <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl font-bold text-sm"
+              style={{background:'linear-gradient(135deg,rgba(199,154,59,0.18),rgba(217,108,47,0.12))',color:'#C79A3B',border:'1px solid rgba(199,154,59,0.35)'}}>
+              🏆 Prêmio: {round.premio}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Último número sorteado */}

@@ -18,6 +18,7 @@ export default function AdminPanel() {
   const [manualNum, setManualNum] = useState('');
   const [mode, setMode] = useState('auto');
   const [newRoundName, setNewRoundName] = useState('');
+  const [newRoundPremio, setNewRoundPremio] = useState('');
   const [creatingRound, setCreatingRound] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -52,9 +53,9 @@ export default function AdminPanel() {
     if (!newRoundName.trim()) return toast.error('Informe o nome da rodada');
     setCreatingRound(true);
     try {
-      await api.post('/rounds', { name: newRoundName.trim() });
+      await api.post('/rounds', { name: newRoundName.trim(), premio: newRoundPremio.trim() });
       toast.success('Rodada criada!');
-      setShowCreateModal(false); setNewRoundName('');
+      setShowCreateModal(false); setNewRoundName(''); setNewRoundPremio('');
       fetchStats();
     } catch (err) { toast.error(err.response?.data?.error || 'Erro'); }
     finally { setCreatingRound(false); }
@@ -111,6 +112,12 @@ export default function AdminPanel() {
             {round ? (
               <>
                 <p className="font-semibold mb-1" style={{color:'#3A1F14'}}>{round.name}</p>
+                {round.premio && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold mb-2"
+                    style={{background:'linear-gradient(135deg,rgba(199,154,59,0.2),rgba(217,108,47,0.15))',color:'#C79A3B',border:'1px solid rgba(199,154,59,0.3)'}}>
+                    🏆 {round.premio}
+                  </div>
+                )}
                 <div className="flex gap-3 text-sm mb-3" style={{color:'rgba(58,31,20,0.5)'}}>
                   <span>👥 {cards.length} jogadores</span>
                   <span>🎲 {drawn.length}/50 sorteados</span>
@@ -218,7 +225,10 @@ export default function AdminPanel() {
           onClick={e => e.target === e.currentTarget && setShowCreateModal(false)}>
           <div className="card-junina p-6 w-full max-w-sm animate-pop">
             <h3 className="font-display text-lg font-bold mb-4" style={{color:'#4B1E6D'}}>Nova Rodada</h3>
-            <input className="input-junina mb-4" placeholder="Ex: Rodada 1 — Junina da Urca" value={newRoundName} onChange={e => setNewRoundName(e.target.value)} autoFocus onKeyDown={e => e.key === 'Enter' && handleCreateRound()}/>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider" style={{color:'#4B1E6D'}}>Nome da rodada</label>
+            <input className="input-junina mb-3" placeholder="Ex: Rodada 1 — Junina da Urca" value={newRoundName} onChange={e => setNewRoundName(e.target.value)} autoFocus/>
+            <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider" style={{color:'#C79A3B'}}>🏆 Prêmio</label>
+            <input className="input-junina mb-4" placeholder="Ex: Kit festa, Cesta junina..." value={newRoundPremio} onChange={e => setNewRoundPremio(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCreateRound()}/>
             <div className="flex gap-2">
               <button onClick={() => setShowCreateModal(false)} className="flex-1 py-2.5 rounded-xl text-sm font-medium" style={{border:'1.5px solid rgba(199,154,59,0.3)',color:'#6F2DA8'}}>Cancelar</button>
               <button onClick={handleCreateRound} className="btn-primary flex-1 py-2.5 text-sm" disabled={creatingRound}>

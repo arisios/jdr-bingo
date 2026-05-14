@@ -18,12 +18,12 @@ router.get('/', adminMiddleware, (req, res) => {
 });
 
 router.post('/', adminMiddleware, (req, res) => {
-  const { name } = req.body;
+  const { name, premio } = req.body;
   if (!name?.trim()) return res.status(400).json({ error: 'Nome da rodada é obrigatório' });
   const db = getDb();
   const active = db.prepare("SELECT id FROM rounds WHERE status='active'").get();
   if (active) return res.status(400).json({ error: 'Já existe uma rodada ativa. Encerre-a primeiro.' });
-  const result = db.prepare("INSERT INTO rounds (name, status) VALUES (?, 'active')").run(name.trim());
+  const result = db.prepare("INSERT INTO rounds (name, premio, status) VALUES (?, ?, 'active')").run(name.trim(), premio?.trim() || null);
   const round = db.prepare('SELECT * FROM rounds WHERE id=?').get(result.lastInsertRowid);
   broadcast({ type: 'round_started', round });
   res.status(201).json({ round });

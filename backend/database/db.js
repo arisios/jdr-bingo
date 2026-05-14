@@ -18,10 +18,13 @@ function initDb() {
     CREATE TABLE IF NOT EXISTS rounds (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      premio TEXT,
       status TEXT NOT NULL DEFAULT 'waiting',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       finished_at DATETIME
     );
+    -- Migração: adicionar coluna premio se não existir
+
     CREATE TABLE IF NOT EXISTS cards (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       round_id INTEGER NOT NULL,
@@ -39,6 +42,8 @@ function initDb() {
       FOREIGN KEY (round_id) REFERENCES rounds(id)
     );
   `);
+  // Migração: adicionar coluna premio em rounds existentes
+  try { db.exec(`ALTER TABLE rounds ADD COLUMN premio TEXT`); } catch {}
   require('../../../../shared/users-db').getUsersDb();
   console.log('✅ Banco Bingo Juninas inicializado');
   return db;

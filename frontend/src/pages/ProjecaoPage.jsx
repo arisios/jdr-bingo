@@ -55,7 +55,12 @@ export default function ProjecaoPage() {
         <BrandMark size="sm" dark showSub={false} />
         <div style={{textAlign:'center'}}>
           <div style={{color:'#C79A3B',fontSize:14,fontWeight:700,letterSpacing:'0.15em',textTransform:'uppercase'}}>{round?.name || 'Aguardando rodada'}</div>
-          <div style={{color:'rgba(255,255,255,0.4)',fontSize:12}}>{drawn.length}/{TOTAL} sorteados · {online} jogadores</div>
+          {round?.premio && (
+            <div style={{color:'#C79A3B',fontSize:18,fontWeight:900,marginTop:4,letterSpacing:'0.05em'}}>
+              🏆 {round.premio}
+            </div>
+          )}
+          <div style={{color:'rgba(255,255,255,0.4)',fontSize:12,marginTop:2}}>{drawn.length}/{TOTAL} sorteados · {online} jogadores</div>
         </div>
         <div style={{textAlign:'right',color:'rgba(255,255,255,0.3)',fontSize:11,fontFamily:'DM Sans,sans-serif'}}>Bingo 50<br/>Temporada 2026</div>
       </div>
