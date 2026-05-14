@@ -17,7 +17,7 @@ export default function BrandMark({ size = 'md', dark = false, showSub = true })
   return (
     <div style={{ textAlign: 'center', lineHeight: 1, userSelect: 'none' }}>
       <div style={{
-        fontFamily: 'Edmunds, Georgia, serif',
+        fontFamily: 'Edmund, Georgia, serif',
         fontSize: s.juninas,
         color: accentColor,
         letterSpacing: '0.04em',
@@ -26,7 +26,7 @@ export default function BrandMark({ size = 'md', dark = false, showSub = true })
         Juninas
       </div>
       <div style={{
-        fontFamily: 'Edmunds, Georgia, serif',
+        fontFamily: 'Edmund, Georgia, serif',
         fontSize: s.rio,
         color: textColor,
         letterSpacing: '0.12em',

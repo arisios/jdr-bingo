@@ -1,7 +1,7 @@
 export default {
   content: ['./index.html','./src/**/*.{js,jsx}'],
   theme: { extend: {
-    fontFamily: { display:['Edmunds','Georgia','serif'], sans:['"DM Sans"','sans-serif'] },
+    fontFamily: { display:['Edmund','Georgia','serif'], sans:['"DM Sans"','sans-serif'] },
     animation: {
       'pulse-cell':'pulsecell 0.6s ease-out',
       'slide-up':'slideUp 0.3s ease-out','fade-in':'fadeIn 0.25s ease-out',

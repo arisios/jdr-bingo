@@ -3,16 +3,9 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Edmunds';
-  src: url('/fonts/Edmunds.otf') format('opentype');
+  font-family: 'Edmund';
+  src: url('/fonts/Edmund.otf') format('opentype');
   font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Edmunds';
-  src: url('/fonts/EdmundsDistressed.otf') format('opentype');
-  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
