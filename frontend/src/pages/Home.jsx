@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import Bandeirinhas from '../components/Bandeirinhas';
 import LoadingSpinner from '../components/LoadingSpinner';
 import BrandMark from '../components/BrandMark';
+import WalletBadge from '../components/WalletBadge';
 
 export default function Home() {
   const { user, loading: authLoading, logout } = useAuth();
@@ -80,7 +81,8 @@ export default function Home() {
             </div>
           )}
 
-          <div className="text-center mt-6 flex justify-center gap-4">
+          <div className="text-center mt-6 flex justify-center items-center gap-4 flex-wrap">
+            <WalletBadge />
             <a href="/projecao" className="text-xs font-medium" style={{ color: 'rgba(58,31,20,0.35)' }}>📺 Telão</a>
             {user.role === 'admin' && (
               <a href="/admin" className="text-xs font-medium" style={{ color: 'rgba(58,31,20,0.35)' }}>⚙️ Admin</a>
