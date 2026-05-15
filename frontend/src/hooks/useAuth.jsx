@@ -26,8 +26,8 @@ export function AuthProvider({ children }) {
     return persist(data);
   };
 
-  const register = async (name, phone, password) => {
-    const { data } = await api.post('/auth/register', { name, phone, password });
+  const register = async (payload) => {
+    const { data } = await api.post('/auth/register', payload);
     return persist(data);
   };
 

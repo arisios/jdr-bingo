@@ -17,24 +17,28 @@ const formatPhone = (v) => {
 export default function AuthPage({ adminOnly = false }) {
   const [mode, setMode] = useState('login');
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', password: '' });
+  const [tipo, setTipo] = useState('instagram');
+  const [form, setForm] = useState({ name: '', identifier: '', password: '' });
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const handlePhone = (e) => setForm({ ...form, phone: formatPhone(e.target.value) });
+  const handlePhone = (e) => setForm({ ...form, identifier: formatPhone(e.target.value) });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (mode === 'login') {
-        const user = await login(form.phone || form.name, form.password);
+        const user = await login(form.identifier, form.password);
         toast.success(`Bem-vindo(a), ${(user.name || user.instagram || '').split(' ')[0]}! 🎉`);
         navigate(user.role === 'admin' ? '/admin' : '/');
       } else {
         if (!form.name.trim()) return toast.error('Informe seu nome');
-        const user = await register(form.name, form.phone, form.password);
+        const payload = tipo === 'instagram'
+          ? { name: form.name, instagram: form.identifier, password: form.password }
+          : { name: form.name, phone: form.identifier, password: form.password };
+        const user = await register(payload);
         toast.success(`Conta criada! Bem-vindo(a), ${user.name.split(' ')[0]}! 🎉`);
         navigate('/');
       }
@@ -71,24 +75,31 @@ export default function AuthPage({ adminOnly = false }) {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'register' && (
-                <div>
-                  <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider" style={{ color: '#4B1E6D' }}>
-                    Seu nome
-                  </label>
-                  <input name="name" type="text" className="input-junina"
-                    placeholder="Como quer ser chamado(a)"
-                    value={form.name} onChange={handleChange} autoFocus />
-                </div>
+                <>
+                  <div>
+                    <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider" style={{ color: '#4B1E6D' }}>Seu nome</label>
+                    <input name="name" type="text" className="input-junina" placeholder="Como quer ser chamado(a)" value={form.name} onChange={handleChange} autoFocus />
+                  </div>
+                  <div className="flex rounded-xl p-1" style={{ background: 'rgba(199,154,59,0.08)' }}>
+                    {['instagram','telefone'].map(t => (
+                      <button key={t} type="button" onClick={() => { setTipo(t); setForm(f=>({...f,identifier:''})); }}
+                        className="flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                        style={tipo===t ? { background:'#fff', color:'#4B1E6D', boxShadow:'0 1px 4px rgba(75,30,109,0.1)' } : { color:'#6F2DA8' }}>
+                        {t === 'instagram' ? '@ Instagram' : '📱 Telefone'}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
 
               <div>
                 <label className="block text-xs font-bold mb-1.5 uppercase tracking-wider" style={{ color: '#4B1E6D' }}>
-                  {mode === 'login' ? 'Instagram ou Telefone' : 'Telefone'}
+                  {mode === 'login' ? 'Instagram ou Telefone' : tipo === 'instagram' ? '@ Instagram' : 'Telefone'}
                 </label>
-                <input name="phone" type={mode === 'login' ? 'text' : 'tel'} className="input-junina"
-                  placeholder={mode === 'login' ? 'Instagram ou (21) 99999-9999' : '(21) 99999-9999'}
-                  value={form.phone}
-                  onChange={mode === 'login' ? handleChange : handlePhone}
+                <input name="identifier" type={mode === 'register' && tipo === 'telefone' ? 'tel' : 'text'} className="input-junina"
+                  placeholder={mode === 'login' ? 'Instagram ou (21) 99999-9999' : tipo === 'instagram' ? 'seuinstagram' : '(21) 99999-9999'}
+                  value={form.identifier}
+                  onChange={mode === 'register' && tipo === 'telefone' ? handlePhone : handleChange}
                   autoCapitalize="none" required />
               </div>
 
