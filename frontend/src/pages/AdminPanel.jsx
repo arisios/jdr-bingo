@@ -12,7 +12,7 @@ const COL_COLORS = { B:'#C21874', I:'#6F2DA8', N:'#007C91', G:'#D96C2F', O:'#C79
 
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '—';
 
-function RoundDetail({ r, onClose, onFinish, isActive }) {
+function RoundDetail({ r, onClose, onFinish, onDelete, isActive }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3"
       style={{background:'rgba(75,30,109,0.55)',backdropFilter:'blur(6px)'}}
@@ -123,13 +123,21 @@ function RoundDetail({ r, onClose, onFinish, isActive }) {
             </div>
           )}
 
-          {/* Encerrar se ativa */}
-          {isActive && (
-            <button onClick={onFinish} className="w-full py-3 rounded-xl font-bold text-sm"
-              style={{background:'rgba(194,24,116,0.1)',color:'#C21874',border:'1.5px solid rgba(194,24,116,0.2)'}}>
-              🏁 Encerrar esta Rodada
-            </button>
-          )}
+          {/* Ações */}
+          <div className="flex gap-2">
+            {isActive && (
+              <button onClick={onFinish} className="flex-1 py-3 rounded-xl font-bold text-sm"
+                style={{background:'rgba(194,24,116,0.1)',color:'#C21874',border:'1.5px solid rgba(194,24,116,0.2)'}}>
+                🏁 Encerrar Rodada
+              </button>
+            )}
+            {!isActive && (
+              <button onClick={onDelete} className="flex-1 py-3 rounded-xl font-bold text-sm"
+                style={{background:'rgba(194,24,116,0.08)',color:'#C21874',border:'1.5px solid rgba(194,24,116,0.2)'}}>
+                🗑️ Excluir Rodada
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -195,6 +203,17 @@ export default function AdminPanel() {
       fetchStats();
     } catch (err) { toast.error(err.response?.data?.error || 'Erro'); }
     finally { setCreatingRound(false); }
+  };
+
+  const handleDeleteRound = async () => {
+    if (!selectedRound) return;
+    if (!confirm(`Excluir a rodada "${selectedRound.name}"? Isso apaga todos os dados.`)) return;
+    try {
+      await api.delete(`/rounds/${selectedRound.id}`);
+      toast.success('Rodada excluída!');
+      setSelectedRound(null);
+      fetchStats();
+    } catch (err) { toast.error(err.response?.data?.error || 'Erro ao excluir'); }
   };
 
   const handleFinishRound = async () => {
@@ -285,6 +304,33 @@ export default function AdminPanel() {
                   <span>🎲 {drawn.length}/50 sorteados</span>
                   <span>🏆 {bingoCount} bingo(s)</span>
                 </div>
+
+                {/* Ranking — quem está mais perto */}
+                {cards.length > 0 && (
+                  <div className="rounded-xl p-3 mb-4" style={{background:'rgba(75,30,109,0.06)',border:'1px solid rgba(199,154,59,0.15)'}}>
+                    <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{color:'#C79A3B'}}>
+                      🔥 Mais perto do bingo
+                    </p>
+                    <div className="space-y-1.5">
+                      {[...cards].sort((a,b) => b.marked - a.marked).slice(0, 5).map((c, i) => {
+                        const pct = Math.round((c.marked / c.total) * 100);
+                        const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+                        return (
+                          <div key={c.id} className="flex items-center gap-2">
+                            <span className="text-sm w-5 shrink-0">{c.has_bingo ? '🏆' : medals[i]}</span>
+                            <span className="text-xs font-semibold flex-1 truncate" style={{color:'#3A1F14'}}>{c.player_name}</span>
+                            <span className="text-xs font-black shrink-0" style={{color:c.has_bingo?'#C79A3B':pct>=80?'#C21874':'#6F2DA8'}}>
+                              {c.marked}/{c.total}
+                            </span>
+                            <div className="w-16 h-1.5 rounded-full overflow-hidden shrink-0" style={{background:'rgba(58,31,20,0.1)'}}>
+                              <div className="h-full rounded-full" style={{width:`${pct}%`,background:c.has_bingo?'#C79A3B':pct>=80?'#C21874':'#6F2DA8'}}/>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Sorteio */}
                 {lastDrawn && (
@@ -442,6 +488,7 @@ export default function AdminPanel() {
           isActive={selectedRound.status === 'active'}
           onClose={() => setSelectedRound(null)}
           onFinish={handleFinishRound}
+          onDelete={handleDeleteRound}
         />
       )}
 

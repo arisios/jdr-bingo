@@ -38,4 +38,16 @@ router.patch('/:id/finish', adminMiddleware, (req, res) => {
   res.json({ success: true });
 });
 
+router.delete('/:id', adminMiddleware, (req, res) => {
+  const db = getDb();
+  const id = parseInt(req.params.id);
+  const round = db.prepare('SELECT * FROM rounds WHERE id=?').get(id);
+  if (!round) return res.status(404).json({ error: 'Rodada não encontrada' });
+  if (round.status === 'active') return res.status(400).json({ error: 'Encerre a rodada antes de excluir' });
+  db.prepare('DELETE FROM drawn_numbers WHERE round_id=?').run(id);
+  db.prepare('DELETE FROM cards WHERE round_id=?').run(id);
+  db.prepare('DELETE FROM rounds WHERE id=?').run(id);
+  res.json({ success: true });
+});
+
 module.exports = router;
