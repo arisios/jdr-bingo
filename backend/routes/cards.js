@@ -3,6 +3,7 @@ const { getDb } = require('../database/db');
 const { generateCard, hasBingo } = require('../bingo');
 const { authMiddleware } = require('../middleware/auth');
 const { broadcast } = require('../ws-manager');
+const { emitirMoedas } = require('../../../../shared/wallet-emit');
 const router = express.Router();
 
 router.post('/join', authMiddleware, (req, res) => {
@@ -24,6 +25,7 @@ router.post('/join', authMiddleware, (req, res) => {
   const card = db.prepare('SELECT * FROM cards WHERE id=?').get(result.lastInsertRowid);
   card.numbers = JSON.parse(card.numbers);
   const drawn = db.prepare('SELECT number FROM drawn_numbers WHERE round_id=? ORDER BY drawn_at').all(round.id).map(r => r.number);
+  emitirMoedas(req.user.id, 'bingo_participar');
   res.status(201).json({ card, round, drawn });
 });
 
@@ -37,6 +39,7 @@ router.post('/:id/bingo', authMiddleware, (req, res) => {
   if (!hasBingo(grid, new Set(drawn))) return res.status(400).json({ error: 'Ainda não tem bingo válido' });
   db.prepare('UPDATE cards SET has_bingo=1 WHERE id=?').run(card.id);
   broadcast({ type: 'bingo_winner', playerName: card.player_name, cardId: card.id, roundId: card.round_id });
+  emitirMoedas(req.user.id, 'bingo_vencer');
   res.json({ success: true, playerName: card.player_name });
 });
 
