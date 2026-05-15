@@ -83,6 +83,7 @@ export default function GamePage() {
     try {
       await api.post(`/cards/${card.id}/bingo`);
       toast.success('🏆 BINGO confirmado!');
+      toast('🪙 Moedas de vitória adicionadas!', { icon: '🪙', duration: 3000 });
       setConfetti(true);
       setTimeout(() => setConfetti(false), 6000);
     } catch (err) {

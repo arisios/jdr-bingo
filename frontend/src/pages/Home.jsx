@@ -30,6 +30,7 @@ export default function Home() {
     setLoading(true);
     try {
       const { data } = await api.post('/cards/join');
+      toast('🪙 Moedas adicionadas por participar!', { icon: '🪙', duration: 3000 });
       navigate('/jogo', { state: { card: data.card, round: data.round, drawn: data.drawn } });
     } catch (err) {
       toast.error(err.response?.data?.error || 'Erro ao entrar no jogo');
